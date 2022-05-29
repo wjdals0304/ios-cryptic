@@ -78,7 +78,7 @@ extension Asset {
             
         }
         
-        func setupValue( ) {
+        func setupValue(with data: AssetType) {
             
             layer.cornerRadius = 12.0
             layer.shadowColor = UIColor.black.cgColor
@@ -86,15 +86,14 @@ extension Asset {
             layer.shadowRadius = 10
             backgroundColor = .systemBackground
                     
-            titleLabel.text = "Bitcoin"
-            symbolLabel.text = "btc"
+            titleLabel.text = data.name
+            symbolLabel.text = data.symbol
             priceLabel.text = "Price"
             marketCapLabel.text = "Market cap"
-            
-            priceUsd.text = "299"
-            changePercent24Hr.text = "1%"
-            
-            marketCapUsd.text = "22222"
+
+            priceUsd.text = data.priceUsd.currencyFormattedValue()
+            changePercent24Hr.text = data.changePercent24Hr.percentFormattedValue()
+            marketCapUsd.text = data.marketCapUsd.currencyFormattedValue()
             
         }
         
