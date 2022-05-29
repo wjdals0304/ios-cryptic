@@ -20,19 +20,42 @@ extension Asset {
             let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
             collectionView.backgroundColor = .systemBackground
             collectionView.register(Asset.Cell.self, forCellWithReuseIdentifier: Asset.Cell.identifier)
-            collectionView.dataSource = self
             collectionView.backgroundColor = UIColor.appBackground
             return collectionView
-            
         }()
+                
+        private let viewModel: AssetViewModelType
+
+        init(viewModel: AssetViewModelType) {
+            self.viewModel = viewModel
+            super.init()
+  
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
         
         override func setup() {
             super.setup()
             view.addSubview(collectionView)
         }
+  
         
         override func bind() {
             super.bind()
+            
+            Task {
+                
+                do {
+                    try await viewModel.fetchAssets()
+                    collectionView.dataSource = self
+                } catch {
+                    print(error)
+                }
+                
+    
+            }
         }
         
         override func setupConstraint() {
@@ -41,6 +64,7 @@ extension Asset {
                 make.edges.equalToSuperview()
             }
         }
+        
     }
     
 }
@@ -49,15 +73,18 @@ extension Asset {
 extension Asset.ViewController : UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2 
+        
+        return viewModel.assetListGet.data.count
     }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Asset.Cell.identifier, for: indexPath) as? Asset.Cell
+  
+        let data = viewModel.assetListGet.data[indexPath.row]
 
-        cell?.setupValue()
+        cell?.setupValue(with: data)
     
         return cell ?? UICollectionViewCell()
 
